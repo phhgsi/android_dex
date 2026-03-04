@@ -1,0 +1,46 @@
+# Copyright (C) 2024 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Desktop Mode Service Type Enforcement
+# Additional rules for the Desktop Mode service
+
+# Allow desktop_mode_service to be started by init
+init_daemon_domain(desktop_mode_service)
+
+# Allow desktop_mode_service to add service to service_manager
+allow desktop_mode_service desktop_mode_service:service_manager add;
+
+# Allow desktop_mode_service to communicate with system_server
+allow desktop_mode_service system_server: binder { call transfer };
+
+# Allow desktop_mode_service to access /system/bin/desktopd
+allow desktop_mode_service desktop_mode_service_exec:file execute;
+
+# Allow desktop_mode_service to read/write to socket files
+allow desktop_mode_service desktop_mode_service:sock_file create_file_perms;
+
+# Allow desktop_mode_service to create sockets
+allow desktop_mode_service desktop_mode_service:unix_stream_socket { create connect };
+
+# Allow desktop_mode_service to access property files
+allow desktop_mode_service property_socket:sock_file write;
+
+# Allow desktop_mode_service to use kernel features
+allow desktop_mode_service kernel:system { syslog_mod };
+
+# Allow desktop_mode_service to access package manager
+allow desktop_mode_service package_manager_service:service_manager find;
+
+# Allow desktop_mode_service to access notification manager
+allow desktop_mode_service notification_manager_service:service_manager find;

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2024 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/desk_taskbar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="#1A1A2E"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:elevation="8dp">
+
+    <!-- Home Button -->
+    <ImageButton
+        android:id="@+id/desk_home_button"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/desk_home_button_desc"
+        android:padding="16dp"
+        android:src="@drawable/ic_desk_taskbar_home" />
+
+    <!-- Running Apps - Horizontal Scroll -->
+    <HorizontalScrollView
+        android:id="@+id/desk_apps_scroll"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        android:fadingEdge="horizontal"
+        android:fadingEdgeLength="24dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/desk_apps_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    </HorizontalScrollView>
+
+    <!-- System Tray -->
+    <com.android.systemui.desktop.DesktopSystemTray
+        android:id="@+id/desk_system_tray"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp" />
+
+</LinearLayout>

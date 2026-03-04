@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Desktop Launcher</string>
+    
+    <!-- General -->
+    <string name="search">Search</string>
+    <string name="search_apps">Search apps...</string>
+    <string name="settings">Settings</string>
+    <string name="app_icon">App icon</string>
+    <string name="folder_icon">Folder icon</string>
+    <string name="no_apps">No apps found</string>
+    <string name="loading">Loading...</string>
+    
+    <!-- App Actions -->
+    <string name="launch_app">Launch app</string>
+    <string name="app_info">App info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="create_folder">Create folder</string>
+    <string name="add_to_folder">Add to folder</string>
+    <string name="remove_from_folder">Remove from folder</string>
+    
+    <!-- Settings -->
+    <string name="display_settings">Display</string>
+    <string name="theme_settings">Theme</string>
+    <string name="about">About</string>
+    <string name="version">Version</string>
+    
+    <!-- Window Management -->
+    <string name="minimize">Minimize</string>
+    <string name="maximize">Maximize</string>
+    <string name="close">Close</string>
+    <string name="running_apps">Running apps</string>
+    
+    <!-- Dialogs -->
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="delete">Delete</string>
+    <string name="folder_name_hint">Folder name</string>
+    <string name="enter_folder_name">Enter folder name</string>
+    
+    <!-- Accessibility -->
+    <string name="content_description_app_grid">App grid</string>
+    <string name="content_description_search">Search for apps</string>
+    <string name="content_description_settings">Open settings</string>
+    <string name="content_description_app_item">%1$s, double tap to open</string>
+    <string name="content_description_folder_item">%1$s folder with %2$d apps</string>
+    
+    <!-- Settings -->
+    <string name="grid_settings">Grid</string>
+    <string name="behavior_settings">Behavior</string>
+    <string name="grid_columns">Grid columns</string>
+    <string name="show_system_apps">Show system apps</string>
+    <string name="sort_order">Sort order</string>
+    <string name="sort_by_name">By name</string>
+    <string name="sort_by_install_date">By install date</string>
+    <string name="sort_by_last_update">By last update</string>
+    <string name="sort_by_size">By size</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="auto_launch">Auto launch in window</string>
+    <string name="window_animation">Window animation</string>
+    <string name="reset_to_defaults">Reset to defaults</string>
+    <string name="version_format">Version %1$s (%2$d)</string>
+    <string name="version_unknown">Version unknown</string>
+    <string name="open_folder">Open folder</string>
+    <string name="rename_folder">Rename folder</string>
+    <string name="delete_folder">Delete folder</string>
+</resources>

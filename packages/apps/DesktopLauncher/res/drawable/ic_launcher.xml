@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M0,0h108v108h-108z"/>
+    
+    <!-- Desktop Icon Shape -->
+    <path
+        android:fillColor="#16213E"
+        android:pathData="M24,24h60v48h-60z"/>
+    
+    <!-- Monitor Screen -->
+    <path
+        android:fillColor="#0F0F1A"
+        android:pathData="M28,28h52v36h-52z"/>
+    
+    <!-- Screen Content - App Grid -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M32,32h10v10h-10z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M44,32h10v10h-10z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M56,32h10v10h-10z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M32,44h10v10h-10z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M44,44h10v10h-10z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M56,44h10v10h-10z"/>
+    
+    <!-- Monitor Stand -->
+    <path
+        android:fillColor="#16213E"
+        android:pathData="M48,72h12v6h-12z"/>
+    
+    <!-- Monitor Base -->
+    <path
+        android:fillColor="#16213E"
+        android:pathData="M40,78h28v4h-28z"/>
+
+</vector>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Taskbar -->
+    <string name="desk_home_button_desc">Home</string>
+    <string name="desk_app_icon_desc">App icon</string>
+    <string name="desk_running_apps">Running apps</string>
+
+    <!-- Window Decoration -->
+    <string name="desk_window_app_icon_desc">Window app icon</string>
+    <string name="desk_window_minimize_desc">Minimize window</string>
+    <string name="desk_window_maximize_desc">Maximize window</string>
+    <string name="desk_window_close_desc">Close window</string>
+
+    <!-- Notification Panel -->
+    <string name="desk_notifications">Notifications</string>
+    <string name="desk_quick_settings">Quick Settings</string>
+    <string name="desk_no_notifications">No notifications</string>
+    <string name="desk_clear_all_desc">Clear all notifications</string>
+    <string name="desk_settings_desc">Settings</string>
+    <string name="desk_dismiss_notification">Dismiss notification</string>
+    <string name="desk_notification_app_icon_desc">Notification app icon</string>
+    <string name="desk_quick_settings_tile_icon">Quick settings tile icon</string>
+
+    <!-- System Tray -->
+    <string name="desk_battery_desc">Battery</string>
+    <string name="desk_network_desc">Network</string>
+    <string name="desk_notifications_indicator_desc">Notifications</string>
+</resources>

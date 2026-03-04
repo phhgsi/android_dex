@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_tiny">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
+    
+    <!-- App Grid -->
+    <dimen name="grid_columns">6</dimen>
+    <dimen name="app_icon_size">80dp</dimen>
+    <dimen name="app_icon_padding">8dp</dimen>
+    <dimen name="grid_spacing">8dp</dimen>
+    
+    <!-- Icons -->
+    <dimen name="icon_small">16dp</dimen>
+    <dimen name="icon_medium">24dp</dimen>
+    <dimen name="icon_large">48dp</dimen>
+    <dimen name="icon_xlarge">72dp</dimen>
+    
+    <!-- Buttons -->
+    <dimen name="button_size">48dp</dimen>
+    <dimen name="button_min_width">88dp</dimen>
+    
+    <!-- Text Sizes -->
+    <dimen name="text_tiny">10sp</dimen>
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_medium">14sp</dimen>
+    <dimen name="text_large">18sp</dimen>
+    <dimen name="text_xlarge">24sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    
+    <!-- Corner Radius -->
+    <dimen name="corner_radius_small">4dp</dimen>
+    <dimen name="corner_radius_medium">8dp</dimen>
+    <dimen name="corner_radius_large">16dp</dimen>
+    <dimen name="corner_radius_xlarge">24dp</dimen>
+    
+    <!-- Elevation -->
+    <dimen name="elevation_low">2dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="elevation_high">8dp</dimen>
+    
+    <!-- Search Bar -->
+    <dimen name="search_bar_height">56dp</dimen>
+    <dimen name="search_bar_margin">16dp</dimen>
+    
+    <!-- Taskbar -->
+    <dimen name="taskbar_height">48dp</dimen>
+    
+    <!-- Status Bar -->
+    <dimen name="status_bar_padding">24dp</dimen>
+</resources>

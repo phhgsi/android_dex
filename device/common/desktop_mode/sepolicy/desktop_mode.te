@@ -1,0 +1,47 @@
+# Copyright (C) 2024 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Desktop Mode Type Enforcement Policy
+# Defines the security context for the Desktop Mode service
+
+# Define the desktop_mode_service domain
+type desktop_mode_service, domain;
+
+# Define the executable type for the desktop mode daemon
+type desktop_mode_service_exec, exec_type, file_type;
+
+# Allow desktop_mode_service to find surfaceflinger service
+allow desktop_mode_service surfaceflinger_service:service_manager find;
+
+# Allow desktop_mode_service to find window service
+allow desktop_mode_service window_service:service_manager find;
+
+# Allow desktop_mode_service to find activity service
+allow desktop_mode_service activity_service:service_manager find;
+
+# Allow desktop_mode_service to find display service
+allow desktop_mode_service display_service:service_manager find;
+
+# Allow desktop_mode_service to interact with app domains
+allow desktop_mode_service appdomain:process { getpgid gettask };
+
+# Allow desktop_mode_service to access graphics device
+allow desktop_mode_service graphics_device:chr_file rw_file_perms;
+
+# Allow desktop_mode_service to access input devices
+allow desktop_mode_service input_device:chr_file rw_file_perms;
+
+# Allow desktop_mode_service to create and manage files in data directory
+allow desktop_mode_service desktop_mode_service_data_file:dir create_dir_perms;
+allow desktop_mode_service desktop_mode_service_data_file:file create_file_perms;
