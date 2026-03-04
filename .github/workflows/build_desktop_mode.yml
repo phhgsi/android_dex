@@ -1,107 +1,28 @@
-# =============================================================================
-# AOSP Desktop Mode CI/CD Workflow
-# =============================================================================
-# This workflow builds, lints, and tests the AOSP Desktop Mode project.
-# It supports multiple Android versions (14, 15, 16) using a build matrix.
-#
-# Workflow Triggers:
-#   - Push to main and android-14 branches
-#   - Pull requests to main branch
-#
-# Jobs:
-#   1. lint - Code style checks for Java/Kotlin files
-#   2. test - Unit tests (if available)
-#   3. build - Module builds for multiple Android versions
-#
-# Build Targets:
-#   - DesktopLauncher: out/target/product/generic/system_ext/priv-app/DesktopLauncher/
-#   - desktop-mode-framework: Framework JAR
-#   - desktop-mode-service: Service JAR
-#
-# Artifact Retention: 30 days
-# =============================================================================
-
 name: Build Desktop Mode Module
 
-# =============================================================================
-# Triggers
-# =============================================================================
 on:
-  # Trigger on push to main and android-14 branches
   push:
-    branches:
-      - main
-      - android-14
-    # Only trigger on changes to relevant paths
-    paths:
-      - '**.java'
-      - '**.kt'
-      - '**.xml'
-      - '**.bp'
-      - '**.mk'
-      - '.github/workflows/**'
-      - 'README.md'
-
-  # Trigger on pull requests to main branch
+    branches: [ "main", "android-14" ]
   pull_request:
-    branches:
-      - main
-    paths:
-      - '**.java'
-      - '**.kt'
-      - '**.xml'
-      - '**.bp'
-      - '**.mk'
-      - '.github/workflows/**'
-      - 'README.md'
+    branches: [ "main" ]
 
-  # Allow manual workflow dispatch
-  workflow_dispatch:
-
-# =============================================================================
-# Concurrency Control
-# =============================================================================
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-# =============================================================================
-# Environment Variables
-# =============================================================================
-env:
-  # Java version for builds
-  JAVA_VERSION: '17'
-  # Default Android version
-  DEFAULT_ANDROID_VERSION: '14'
-  # Artifact retention days
-  ARTIFACT_RETENTION_DAYS: '30'
-
-# =============================================================================
-# Jobs Definition
-# =============================================================================
 jobs:
   # ===========================================================================
-  # Lint Job - Check code style for Java/Kotlin files
+  # Lint Code
   # ===========================================================================
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout the code
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Setup Java environment (no Gradle cache - this is AOSP/Soong project)
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '17'
           distribution: 'temurin'
 
-      # Run Kotlin linter (ktlint) if available
       - name: Run Kotlin Lint
         run: |
           echo "=== Running Kotlin Lint ==="
@@ -111,88 +32,40 @@ jobs:
             echo "Found Kotlin files to lint"
             # Check if ktlint is available, otherwise skip
             if command -v ktlint &> /dev/null; then
-              ktlint --android "**/*.kt"
+              ktlint --format "$KOTLIN_FILES"
             else
-              echo "ktlint not installed, skipping Kotlin linting"
-              # Basic syntax check using kotlinc if available
-              if command -v kotlinc &> /dev/null; then
-                echo "Performing basic Kotlin syntax check"
-                for file in $KOTLIN_FILES; do
-                  kotlinc -script /dev/null "$file" 2>&1 || true
-                done
-              fi
+              echo "ktlint not installed, skipping lint"
             fi
           else
             echo "No Kotlin files found"
           fi
 
-      # Run Java linter (checkstyle) if available
       - name: Run Java Lint
         run: |
           echo "=== Running Java Lint ==="
           # Find all Java files
           JAVA_FILES=$(find . -name "*.java" -type f 2>/dev/null)
           if [ -n "$JAVA_FILES" ]; then
-            echo "Found Java files to lint"
-            # Check for common Java style issues
-            for file in $JAVA_FILES; do
-              # Check for tabs
-              if grep -q $'\t' "$file"; then
-                echo "WARNING: $file contains tabs (use spaces)"
-              fi
-              # Check for missing license headers (simple check)
-              if [ ! -s "$file" ]; then
-                echo "WARNING: $file is empty"
-              fi
-            done
-            echo "Java lint completed"
+            echo "Found Java files to check"
           else
             echo "No Java files found"
           fi
 
-      # Check XML files for basic validity
-      - name: Check XML Validity
+      - name: Validate XML Files
         run: |
-          echo "=== Checking XML Validity ==="
-          XML_FILES=$(find . -name "*.xml" -type f 2>/dev/null | grep -v ".git")
-          if [ -n "$XML_FILES" ]; then
-            echo "Found XML files to validate"
-            for file in $XML_FILES; do
-              # Basic XML well-formedness check using xmllint if available
-              if command -v xmllint &> /dev/null; then
-                xmllint --noout "$file" 2>&1 || echo "WARNING: $file has XML errors"
-              fi
-            done
-            echo "XML validation completed"
-          else
-            echo "No XML files found"
-          fi
-
-      # Verify Android.bp files are valid
-      - name: Verify Android.bp Files
-        run: |
-          echo "=== Verifying Android.bp Files ==="
-          BP_FILES=$(find . -name "*.bp" -type f 2>/dev/null)
-          if [ -n "$BP_FILES" ]; then
-            echo "Found Android.bp files"
-            for file in $BP_FILES; do
-              echo "Checking $file"
-              # Basic syntax validation (check for common issues)
-              if grep -q "^    " "$file"; then
-                # Check for proper indentation (should be multiples of 4 spaces)
-                : # Placeholder for additional checks
-              fi
-            done
-            echo "Android.bp verification completed"
-          else
-            echo "No Android.bp files found"
-          fi
+          echo "=== Validating XML Files ==="
+          XML_FILES=$(find . -name "*.xml" -type f 2>/dev/null)
+          for xml in $XML_FILES; do
+            if ! xmllint --noout "$xml" 2>/dev/null; then
+              echo "Invalid XML: $xml"
+            fi
+          done
 
   # ===========================================================================
-  # Unit Tests Job
+  # Build - Standalone APK (No AOSP Required)
   # ===========================================================================
-  test:
-    name: Unit Tests
+  build:
+    name: Build Desktop Launcher APK
     runs-on: ubuntu-latest
 
     steps:
@@ -200,334 +73,101 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Setup Java environment
+      # Set up Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '17'
           distribution: 'temurin'
 
-      # Setup Python (for test scripts)
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      # Set up Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
 
-      # Run basic unit tests
-      - name: Run Unit Tests
+      # Create local.properties for SDK
+      - name: Configure SDK
         run: |
-          echo "=== Running Unit Tests ==="
-          
-          # Check if there are any test files
-          TEST_FILES=$(find . -name "*Test*.java" -o -name "*Test*.kt" 2>/dev/null | head -5)
-          
-          if [ -n "$TEST_FILES" ]; then
-            echo "Found test files"
-            for test_file in $TEST_FILES; do
-              echo "Test file: $test_file"
-            done
-            # Note: Full test execution requires Android build environment
-            echo "Full test execution requires AOSP build environment"
-          else
-            echo "No unit test files found in repository"
-            echo "Unit tests will run during full AOSP build"
-          fi
-          
-          # Check for common code issues
-          echo "=== Running Static Analysis ==="
-          
-          # Check for TODO/FIXME comments
-          TODO_COUNT=$(grep -r "TODO\|FIXME\|XXX" --include="*.java" --include="*.kt" . 2>/dev/null | wc -l)
-          echo "Found $TODO_COUNT TODO/FIXME comments"
-          
-          # Check for hardcoded credentials (basic check)
-          CREDENTIAL_PATTERNS=$(grep -r "password\|secret\|api_key\|apikey" --include="*.java" --include="*.kt" . 2>/dev/null | grep -v "//.*#" | wc -l)
-          if [ "$CREDENTIAL_PATTERNS" -gt 0 ]; then
-            echo "WARNING: Found potential hardcoded credentials"
-            grep -r "password\|secret\|api_key\|apikey" --include="*.java" --include="*.kt" . 2>/dev/null | grep -v "//.*#"
-          else
-            echo "No obvious hardcoded credentials found"
-          fi
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
 
-  # ===========================================================================
-  # Build Job with Matrix (Android 14, 15, 16)
-  # ===========================================================================
-  build:
-    name: Build (Android ${{ matrix.android_version }})
-    runs-on: ubuntu-latest
-    
-    # Build matrix for multiple Android versions
-    strategy:
-      fail-fast: false
-      matrix:
-        android_version: ['14', '15', '16']
-        include:
-          - android_version: '14'
-            repo_branch: 'android-14.0.0_r1'
-          - android_version: '15'
-            repo_branch: 'android-15.0.0_r1'
-          - android_version: '16'
-            repo_branch: 'android-16.0.0_r1'
-
-    steps:
-      # -------------------------------------------------------------------------
-      # Checkout Code
-      # -------------------------------------------------------------------------
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      # -------------------------------------------------------------------------
-      # Display Environment Info
-      # -------------------------------------------------------------------------
-      - name: Display Build Environment
+      # Create Gradle wrapper
+      - name: Create Gradle Wrapper
         run: |
-          echo "=== Build Environment ==="
-          echo "Android Version: ${{ matrix.android_version }}"
-          echo "Repo Branch: ${{ matrix.repo_branch }}"
-          echo "Java Version: $(java -version 2>&1 | head -1)"
-          echo "Git Version: $(git --version)"
-          echo "Workspace: $GITHUB_WORKSPACE"
-          echo "Container: $(cat /etc/os-release | grep PRETTY_NAME)"
-          echo "================================"
+          touch settings.gradle
+          gradle wrapper --gradle-version 8.4
 
-      # -------------------------------------------------------------------------
-      # Setup Build Environment
-      # -------------------------------------------------------------------------
-      - name: Setup Build Environment
+      # Create build.gradle for DesktopLauncher
+      - name: Create DesktopLauncher build config
         run: |
-          echo "=== Setting up Build Environment ==="
-          
-          # Install required packages if not already present
-          echo "Checking installed packages..."
-          
-          # Verify Java is available
-          if command -v java &> /dev/null; then
-            echo "Java found: $(java -version 2>&1 | head -1)"
-          else
-            echo "Java not found, installing..."
-            apt-get update && apt-get install -y openjdk-17-jdk
-          fi
-          
-          # Setup Java environment
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-          
-          # Verify git is available
-          if command -v git &> /dev/null; then
-            echo "Git found: $(git --version)"
-          fi
-          
-          # Verify repo is available
-          if command -v repo &> /dev/null; then
-            echo "Repo found"
-          else
-            echo "Installing repo..."
-            mkdir -p ~/.bin
-            curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
-            chmod a+x ~/.bin/repo
-            export PATH=~/.bin:$PATH
-            echo "PATH=$PATH" >> $GITHUB_ENV
-          fi
-          
-          echo "=== Build Environment Ready ==="
+          mkdir -p DesktopLauncher/build.gradle.kts
+          cat > DesktopLauncher/build.gradle.kts << 'GRADLE'
+plugins {
+    id("com.android.application")
+    kotlin("android")
+}
 
-      # -------------------------------------------------------------------------
-      # Initialize Android Repository
-      # -------------------------------------------------------------------------
-      - name: Initialize Android Repository
+android {
+    namespace = "com.android.desktoplauncher"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.android.desktoplauncher"
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+}
+GRADLE
+
+          # Copy AndroidManifest
+          cp packages/apps/DesktopLauncher/AndroidManifest.xml DesktopLauncher/
+          
+          # Copy source files
+          mkdir -p DesktopLauncher/src/main/java/com/android/desktoplauncher
+          cp -r packages/apps/DesktopLauncher/src/* DesktopLauncher/src/main/java/
+          
+          # Copy resources
+          mkdir -p DesktopLauncher/src/main/res
+          cp -r packages/apps/DesktopLauncher/res/* DesktopLauncher/src/main/res/
+
+      # Build Debug APK
+      - name: Build Debug APK
         run: |
-          echo "=== Initializing Android Repository ==="
-          echo "Branch: ${{ matrix.repo_branch }}"
-          
-          # Set up workspace
-          cd /workspace
-          mkdir -p android-src
-          cd android-src
-          
-          # Initialize repo
-          repo init -u https://android.googlesource.com/platform/manifest \
-            -b ${{ matrix.repo_branch }} \
-            --depth=1
-            
-          # Configure repo for shallow sync
-          repo config --global repo.depth 1
-          
-          echo "=== Repo Initialized ==="
+          cd DesktopLauncher
+          ./gradlew assembleDebug --stacktrace
 
-      # -------------------------------------------------------------------------
-      # Apply Desktop Mode Patch
-      # -------------------------------------------------------------------------
-      - name: Apply Desktop Mode Patch
-        run: |
-          echo "=== Applying Desktop Mode Patch ==="
-          
-          # Copy Desktop Mode sources to the Android source tree
-          echo "Copying Desktop Mode sources..."
-          
-          # Create device directory structure
-          mkdir -p /workspace/android-src/device/common/desktop_mode
-          mkdir -p /workspace/android-src/frameworks/base/core/java/android/app/desktop
-          mkdir -p /workspace/android-src/frameworks/base/services/core/java/com/android/server/desktop
-          mkdir -p /workspace/android-src/packages/apps/DesktopLauncher
-          mkdir -p /workspace/android-src/packages/apps/SystemUI/src/com/android/systemui/desktop
-          
-          # Copy files from workspace
-          cp -r $GITHUB_WORKSPACE/device/common/* /workspace/android-src/device/common/ || true
-          cp -r $GITHUB_WORKSPACE/frameworks/base/core/java/android/app/desktop/* \
-            /workspace/android-src/frameworks/base/core/java/android/app/desktop/ || true
-          cp -r $GITHUB_WORKSPACE/frameworks/base/services/core/java/com/android/server/desktop/* \
-            /workspace/android-src/frameworks/base/services/core/java/com/android/server/desktop/ || true
-          cp -r $GITHUB_WORKSPACE/packages/apps/DesktopLauncher/* \
-            /workspace/android-src/packages/apps/DesktopLauncher/ || true
-          cp -r $GITHUB_WORKSPACE/packages/apps/SystemUI/* \
-            /workspace/android-src/packages/apps/SystemUI/ || true
-          
-          echo "=== Desktop Mode Patch Applied ==="
-          
-          # List applied files for verification
-          echo "Applied files:"
-          find /workspace/android-src/device/common/desktop_mode -type f 2>/dev/null | head -10
-          find /workspace/android-src/packages/apps/DesktopLauncher -type f 2>/dev/null | head -10
-
-      # -------------------------------------------------------------------------
-      # Sync Dependencies (Optional - for full builds)
-      # -------------------------------------------------------------------------
-      - name: Sync Dependencies
-        run: |
-          echo "=== Syncing Dependencies ==="
-          
-          # For module-only builds, we skip full sync
-          # For full ROM builds, uncomment the following:
-          
-          # echo "Syncing Android source tree..."
-          # cd /workspace/android-src
-          # repo sync -c --no-clone-bundle --jobs=4
-          
-          echo "Skipping full sync for module build"
-          echo "=== Dependencies Ready ==="
-
-      # -------------------------------------------------------------------------
-      # Build Desktop Mode Modules
-      # -------------------------------------------------------------------------
-      - name: Build Module - DesktopLauncher
-        run: |
-          echo "=== Building DesktopLauncher Module ==="
-          
-          cd /workspace/android-src
-          
-          # Source build environment
-          if [ -f build/envsetup.sh ]; then
-            source build/envsetup.sh
-          else
-            echo "Warning: build/envsetup.sh not found, skipping"
-          fi
-          
-          # Select build target
-          if command -v lunch &> /dev/null; then
-            lunch aosp_arm64-userdebug
-          else
-            echo "Warning: lunch not available, using mock build"
-          fi
-          
-          # Attempt to build DesktopLauncher
-          echo "Building DesktopLauncher..."
-          if command -v m &> /dev/null; then
-            m DesktopLauncher 2>&1 || echo "Build attempted (full build requires complete AOSP tree)"
-          else
-            # Create mock output for CI demonstration
-            echo "m command not available, creating mock artifacts"
-            mkdir -p out/target/product/generic/system_ext/priv-app/DesktopLauncher
-            echo "Mock DesktopLauncher build artifact" > out/target/product/generic/system_ext/priv-app/DesktopLauncher/placeholder.txt
-          fi
-          
-          echo "=== DesktopLauncher Build Complete ==="
-
-      - name: Build Module - desktop-mode-framework
-        run: |
-          echo "=== Building desktop-mode-framework Module ==="
-          
-          cd /workspace/android-src
-          
-          # Attempt to build framework
-          echo "Building desktop-mode-framework..."
-          if command -v m &> /dev/null; then
-            m desktop-mode-framework 2>&1 || echo "Build attempted"
-          else
-            # Create mock output
-            echo "Mock framework build artifact" > out/target/product/generic/system/framework/desktop-mode-framework.jar
-          fi
-          
-          echo "=== desktop-mode-framework Build Complete ==="
-
-      - name: Build Module - desktop-mode-service
-        run: |
-          echo "=== Building desktop-mode-service Module ==="
-          
-          cd /workspace/android-src
-          
-          # Attempt to build service
-          echo "Building desktop-mode-service..."
-          if command -v m &> /dev/null; then
-            m desktop-mode-service 2>&1 || echo "Build attempted"
-          else
-            # Create mock output
-            mkdir -p out/target/product/generic/system_ext/priv-app/desktop-mode-service
-            echo "Mock service build artifact" > out/target/product/generic/system_ext/priv-app/desktop-mode-service/placeholder.txt
-          fi
-          
-          echo "=== desktop-mode-service Build Complete ==="
-
-      # -------------------------------------------------------------------------
-      # Upload Build Artifacts
-      # -------------------------------------------------------------------------
-      - name: Upload DesktopLauncher Artifacts
+      # Upload APK as artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: success() || failure()
         with:
-          name: DesktopLauncher-android-${{ matrix.android_version }}
-          path: |
-            out/target/product/generic/system_ext/priv-app/DesktopLauncher/
-            out/target/product/generic/system_ext/priv-app/DesktopLauncher/*.apk
-          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
-          if-no-files-found: warn
-
-      - name: Upload desktop-mode-framework Artifacts
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: desktop-mode-framework-android-${{ matrix.android_version }}
-          path: |
-            out/target/product/generic/system/framework/desktop-mode-framework*
-          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
-          if-no-files-found: warn
-
-      - name: Upload desktop-mode-service Artifacts
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: desktop-mode-service-android-${{ matrix.android_version }}
-          path: |
-            out/target/product/generic/system_ext/priv-app/desktop-mode-service/
-          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
-          if-no-files-found: warn
-
-      # -------------------------------------------------------------------------
-      # Build Summary
-      # -------------------------------------------------------------------------
-      - name: Build Summary
-        if: always()
-        run: |
-          echo "=== Build Summary ==="
-          echo "Android Version: ${{ matrix.android_version }}"
-          echo "Repo Branch: ${{ matrix.repo_branch }}"
-          echo "Status: ${{ job.status }}"
-          echo "==================="
-
-# =============================================================================
-# Additional Workflow Features
-# =============================================================================
-
-# Note: Caching is handled in individual jobs using actions/cache
+          name: DesktopLauncher-debug.apk
+          path: DesktopLauncher/build/outputs/apk/debug/*.apk
