@@ -118,7 +118,7 @@ jobs:
       - name: Build Debug APK
         run: |
           cd DesktopLauncher
-          ./gradlew assembleDebug --stacktrace
+          gradle assembleDebug --stacktrace
 
       # Upload APK as artifact
       - name: Upload APK
