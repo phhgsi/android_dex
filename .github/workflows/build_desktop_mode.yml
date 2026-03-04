@@ -120,6 +120,7 @@ jobs:
       # Build Debug APK
       - name: Build Debug APK
         run: |
+          rm -f settings.gradle
           cd DesktopLauncher
           gradle assembleDebug --stacktrace
 
