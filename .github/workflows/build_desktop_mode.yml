@@ -114,6 +114,9 @@ jobs:
           mkdir -p DesktopLauncher/src/main/res
           cp -r packages/apps/DesktopLauncher/res/* DesktopLauncher/src/main/res/
 
+          # Create settings.gradle.kts for standalone build
+          echo "rootProject.name = "DesktopLauncher"" > DesktopLauncher/settings.gradle.kts
+
       # Build Debug APK
       - name: Build Debug APK
         run: |
