@@ -3,7 +3,7 @@
 ## 📋 Project Overview
 **Objective:** Develop a custom Android system modification that replicates the Samsung DeX desktop experience on AOSP-based Custom ROMs.  
 **Goal:** Enable a windowed desktop environment, taskbar, and mouse/keyboard support when an external display is connected via USB-C/HDMI.  
-**Target Android Versions:** Android 13 (Tiramisu) / Android 14 (UpsideDownCake)  
+**Target Android Versions:** Android 13 (Tiramisu) / Android 14 (UpsideDownCake)  /Android 15 /Android 16
 **License:** Apache 2.0 (Must not include proprietary Samsung binaries)
 
 ---
@@ -81,7 +81,7 @@ Based on analysis of Samsung DeX functionality, the following features must be r
 Below is the template for building the Desktop Mode System Service and Overlay.
 
 ```python
-# device/custom/desktop_mode/Android.bp
+# Android.bp
 
 android_library {
     name: "desktop-mode-framework",
